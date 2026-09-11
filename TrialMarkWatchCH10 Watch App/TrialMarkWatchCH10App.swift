@@ -1,6 +1,6 @@
 //
-//  TrailMarkCh10App.swift
-//  TrailMarkCh10
+//  TrialMarkWatchCH10App.swift
+//  TrialMarkWatchCH10 Watch App
 //
 //  Created by Lemuel Gayle on 9/8/26.
 //
@@ -9,8 +9,8 @@ import SwiftUI
 import TrialMarkCH10Core
 
 @main
-struct TrailMarkCh10App: App {
-    @State private var model = AppModel()
+struct TrialMarkWatchCH10_Watch_AppApp: App {
+    @State private var model = WatchAppModel()
 
     var body: some Scene {
         WindowGroup {

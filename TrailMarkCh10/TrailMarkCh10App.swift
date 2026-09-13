@@ -16,9 +16,6 @@ struct TrailMarkCh10App: App {
         WindowGroup {
             ContentView()
                 .environment(model)
-                .task {
-                    await model.health.requestAuthorization()
-                }
         }
     }
 }

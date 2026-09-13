@@ -9,10 +9,17 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        TodayDashboardView()
-            .tabItem {
-                Label("Today", systemImage: "sun.max.fill")
-            }
+        TabView {
+            TodayDashboardView()
+                .tabItem {
+                    Label("Today", systemImage: "sun.max.fill")
+                }
+
+            FieldJournalView()
+                .tabItem {
+                    Label("Journal", systemImage: "book.closed.fill")
+                }
+        }
     }
 }
 

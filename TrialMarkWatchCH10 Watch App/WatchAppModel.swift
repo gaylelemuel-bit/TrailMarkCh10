@@ -12,4 +12,8 @@ import TrialMarkCH10Core
 @Observable
 final class WatchAppModel {
     let health = HealthKitManager()
+    let media = MediaStore()
+    let recorder = AudioRecorder()
+    let player = AudioPlayer()
+    let motion = MotionManager()
 }

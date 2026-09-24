@@ -85,7 +85,7 @@ struct FieldJournalView: View {
     }
 }
 
-private struct MemoRow: View {
+struct MemoRow: View {
     @Environment(AppModel.self) private var model
     @State private var thumbnail: UIImage?
 

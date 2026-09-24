@@ -14,4 +14,9 @@ import TrialMarkCH10Core
 final class AppModel {
     let health = HealthKitManager()
     let media = MediaStore()
+    let journeyStore = JourneyStore()
+
+    init() {
+        journeyStore.seedDemoDataIfEmpty()
+    }
 }

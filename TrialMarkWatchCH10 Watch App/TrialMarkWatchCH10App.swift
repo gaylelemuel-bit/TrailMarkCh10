@@ -16,9 +16,6 @@ struct TrialMarkWatchCH10_Watch_AppApp: App {
         WindowGroup {
             ContentView()
                 .environment(model)
-                .task {
-                    await model.health.requestAuthorization()
-                }
         }
     }
 }

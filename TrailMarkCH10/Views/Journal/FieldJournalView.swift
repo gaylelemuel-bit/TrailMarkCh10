@@ -3,10 +3,10 @@ import TrailMarkCH10Core
 
 struct FieldJournalView: View {
     @Environment(AppModel.self) private var model
-    
+
     @State private var showingAudioRecorder = false
     @State private var showingVideoPicker = false
-    
+
     var body: some View {
         NavigationStack {
             Group {
@@ -23,7 +23,6 @@ struct FieldJournalView: View {
                                 MemoRow(memo: memo)
                             }
                         }
-                        // TODO: Go back and implement delete
                     }
                 }
             }
@@ -62,10 +61,9 @@ struct MemoRow: View {
     @Environment(AppModel.self) private var model
 
     let memo: MediaMemo
-    
-    // This will be to show for video only
+
     @State private var thumbnail: UIImage?
-    
+
     var body: some View {
         HStack(spacing: 12) {
             ZStack {
@@ -82,7 +80,7 @@ struct MemoRow: View {
                 }
             }
             .frame(width: 54, height: 54)
-            
+
             VStack(alignment: .leading, spacing: 4) {
                 Text(memo.title).font(.headline).lineLimit(1)
                 HStack(spacing: 8) {

@@ -7,51 +7,48 @@ import Observation
 @MainActor
 @Observable
 final class WorkoutSessionManager: NSObject {
-    
-    // This flag is to communicate the UI that there is a workout in progress
+
     public private(set) var isRunning: Bool = false
-    
+
     public private(set) var heartRate: Double = 0.0
     public private(set) var activeEnergy: Double = 0.0
     public private(set) var distanceMeters: Double = 0.0
     public private(set) var startDate: Date?
-    
-    // Callback function that will be executed once the workout is completed by the user
+
     public var onFinish: ((WorkoutRecord) -> Void)?
-    
+
     private let store = HKHealthStore()
     private let session: HKWorkoutSession?
     private let builder: HKWorkoutBuilder?
-    
+
     public override init() { super.init() }
-    
+
     public var elapsed: TimeInterval {
         guard let startDate else { return }
-        return Date().timeIntervalSince(startDate) // return number of seconds betwen startDate and Current Date
+        return Date().timeIntervalSince(startDate)
     }
-    
-    // MARK: - LifeCycle Control Functions
-    
+
+
     public func start() {
         guard !isRunning else { return }
-        
+
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .walking
         configuration.locationType = .outdoor
-        
+
         do {
             let session = try HKWorkoutSession(healthStore: store, configuration: configuration)
             let builder = session.associatedWorkoutBuilder()
-            builder.dataSource = HKLiveWorkoutDataSource(healthStore: store) // Getting data straigh from sensors
-            
+            builder.dataSource = HKLiveWorkoutDataSource(healthStore: store)
+
             session.delegate = self
             builder.delegate = self
-            
+
             self.session = session
             self.builder = builder
-            
+
             let now = Date()
- 
+
             session.startActivity(with: now)
             builder.beginCollection(withStart: now) { [weak self] _, error in
                 Task { @MainActor in
@@ -64,7 +61,7 @@ final class WorkoutSessionManager: NSObject {
             isRunning = false
         }
     }
-    
+
     public func end() {
         guard let session, let builder else { return }
         let endDate = Date()
@@ -75,7 +72,7 @@ final class WorkoutSessionManager: NSObject {
             }
         }
     }
-    
+
     public func finalize(end: Date) {
         let record = WorkoutRecord(
             start: startDate ?? end,
@@ -91,7 +88,6 @@ final class WorkoutSessionManager: NSObject {
     }
 }
 
-// MARK: - Session Delegator (listen for all session events)
 extension WorkoutSessionManager: HKWorkoutSessionDelegate {
     nonisolated public func workoutSession(
         _ session: HKWorkoutSession,
@@ -99,7 +95,7 @@ extension WorkoutSessionManager: HKWorkoutSessionDelegate {
     ) {
         Task { @MainActor in self?.isRunning = false }
     }
-    
+
     nonisolated public func workoutSession(
         _ session: HKWorkoutSession,
         didChangeTo toState: HKWorkoutSessionState,
@@ -112,25 +108,23 @@ extension WorkoutSessionManager: HKWorkoutSessionDelegate {
     }
 }
 
-// MARK: - Builder Delegator (lister for all builder envents)
 extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
     nonisolated public func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) { }
-    
+
     nonisolated public func workoutBuilder(
         _ workoutBuilder: HKLiveWorkoutBuilder,
         didCollectDataOf collectedTypes: Set<HKSampleType>
     ) {
         for type in collectedTypes {
-            // This guard acts as a filter so we just collect quantityTypes that also have statistics on them
             guard let quantityType = type as? HKQuantityType,
                   let statistics = workoutBuilder.statistics(for: quantityType) else { return }
-            
+
             switch quantityType {
             case HKQuantityType(.heartRate):
                 let unit = HKUnit.count().unitDivided(by: .minute())
                 let bpm = statistics.mostRecentQuantity()?.doubleValue(for: unit) ?? 0.0
                 Task { @MainActor in self?.heartRate = bpm }
-                
+
             case HKQuantityType(.activeEnergyBurned):
                 let kcal = statistics.sumQuantity()?.doubleValue(for: .kilocalorie()) ?? 0.0
                 Task { @MainActor in self?.activeEnergy = kcal }
@@ -138,7 +132,7 @@ extension WorkoutSessionManager: HKLiveWorkoutBuilderDelegate {
             case HKQuantityType(.distanceWalkingRunning):
                 let distance = statistics.sumQuantity()?.doubleValue(for: .meter()) ?? 0.0
                 Task { @MainActor in self?.distanceMeters = distance }
-                
+
             default:
                 break
             }

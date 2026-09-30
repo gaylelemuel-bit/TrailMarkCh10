@@ -6,7 +6,7 @@ struct JourneyDetailsView: View {
     @Environment(AppModel.self) private var model
 
     let journey: Journey
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -20,18 +20,18 @@ struct JourneyDetailsView: View {
         .navigationTitle(journey.title)
         .navigationBarTitleDisplayMode(.inline)
     }
-    
+
     private var memos: [MediaMemo] {
         model.media.memos.filter { journey.memoIDs.contains($0.id) }
     }
-    
+
     private var map: some View {
         Map(initialPosition: cameraPosition) {
             if !journey.track.isEmpty {
                 MapPolyline(coordinates:  journey.track.coordinates)
                     .stroke(.orange, lineWidth: 4)
             }
-            
+
             ForEach(memos) { memo in
                 if let coordinate = memo.coordinate {
                     Marker(
@@ -45,7 +45,7 @@ struct JourneyDetailsView: View {
         .frame(height: 280)
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
-    
+
     private var cameraPosition: MapCameraPosition {
         if let firstCoordinate = journey.track.points.first {
             return MapCameraPosition.region(
@@ -55,10 +55,10 @@ struct JourneyDetailsView: View {
                 )
             )
         }
-        
+
         return MapCameraPosition.automatic
     }
-    
+
     private var stats: some View {
         HStack {
             stat(
@@ -81,7 +81,7 @@ struct JourneyDetailsView: View {
         .padding()
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
     }
-    
+
     private func stat(_ label: String, _ value: String) -> some View {
         VStack(spacing: 4) {
             Text(value).font(.headline)
@@ -89,7 +89,7 @@ struct JourneyDetailsView: View {
         }
         .frame(maxWidth: .infinity)
     }
-    
+
     private func workoutSection(_ workout: WorkoutRecord) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Activity", systemImage: "figure.walk").font(.headline)
@@ -103,7 +103,7 @@ struct JourneyDetailsView: View {
         .padding()
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
     }
-    
+
     @ViewBuilder
     private var memoSection: some View {
         if !memos.isEmpty {

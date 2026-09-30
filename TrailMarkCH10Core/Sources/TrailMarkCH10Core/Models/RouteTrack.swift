@@ -7,7 +7,7 @@ public struct TrackPoint: Hashable, Sendable, Codable, Identifiable {
     public var longitude: Double
     public var altitude: Double
     public var timestamp: Date
-    
+
     public init(
         id: UUID = UUID(),
         latitude: Double,
@@ -21,7 +21,7 @@ public struct TrackPoint: Hashable, Sendable, Codable, Identifiable {
         self.altitude = altitude
         self.timestamp = timestamp
     }
-    
+
     public init(location: CLLocation) {
         self.init(
             latitude: location.coordinate.latitude,
@@ -30,7 +30,7 @@ public struct TrackPoint: Hashable, Sendable, Codable, Identifiable {
             timestamp: location.timestamp
         )
     }
-    
+
     public var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
@@ -38,36 +38,36 @@ public struct TrackPoint: Hashable, Sendable, Codable, Identifiable {
 
 public struct RouteTrack: Hashable, Sendable, Codable {
     public var points: [TrackPoint]
-    
+
     public init(points: [TrackPoint] = []) {
         self.points = points
     }
-    
+
     public var coordinates: [CLLocationCoordinate2D] {
         points.map(\.coordinate)
     }
-    
+
     public var distanceMeters: Double {
         guard points.count > 1 else { return 0 }
-        
+
         var total: Double = 0
-        
+
         for i in 1..<points.count {
             let a = CLLocation(
                 latitude: points[i - 1].latitude,
                 longitude: points[i - 1].longitude
             )
-            
+
             let b = CLLocation(
                 latitude: points[i].latitude,
                 longitude: points[i].longitude
             )
-            
+
             total += b.distance(from: a)
         }
-        
+
         return total
     }
-    
+
     public var isEmpty: Bool { points.isEmpty }
 }

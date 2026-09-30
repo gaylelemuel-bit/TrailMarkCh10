@@ -20,7 +20,6 @@ struct RecoveryView: View {
                 VStack(spacing: 16) {
                     sleepCard
                     energyChartCard
-                    // saveWorkoutCard
                 }
                 .padding()
             }
@@ -30,7 +29,6 @@ struct RecoveryView: View {
         }
     }
 
-    // MARK: - Sleep (read a category type)
 
     private var sleepCard: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -47,7 +45,6 @@ struct RecoveryView: View {
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    // MARK: - 7-Day Energy Trend (Swift Charts)
 
     private var energyChartCard: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -67,7 +64,7 @@ struct RecoveryView: View {
                 }
                 .chartXAxis {
                     AxisMarks(values: .stride(by: .day)) { _ in
-                        AxisValueLabel(format: .dateTime.weekday(.narrow)) // M T W T F S S
+                        AxisValueLabel(format: .dateTime.weekday(.narrow))
                     }
                 }
                 .frame(height: 200)
@@ -78,7 +75,6 @@ struct RecoveryView: View {
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    // MARK: - Write a Workout
 
     private var saveWorkoutCard: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -119,7 +115,6 @@ struct RecoveryView: View {
         }
     }
 
-    // MARK: - Actions
 
     private func refresh() async {
         await model.health.refreshLastNightSleep()
@@ -131,7 +126,7 @@ struct RecoveryView: View {
 
         let end = Date()
         let record = WorkoutRecord(
-            start: end.addingTimeInterval(-1800), // 30 minutes ago
+            start: end.addingTimeInterval(-1800),
             end: end,
             activeEnergyKcal: 180,
             distanceMeters: 2400
@@ -141,7 +136,6 @@ struct RecoveryView: View {
             do {
                 try await model.health.save(record)
                 saveState = .saved
-                // The write we just made should show up in the chart.
                 await model.health.refreshEnergyTrend()
             } catch {
                 saveState = .failed(error.localizedDescription)

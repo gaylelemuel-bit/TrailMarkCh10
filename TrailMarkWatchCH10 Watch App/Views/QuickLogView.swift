@@ -1,15 +1,12 @@
 import SwiftUI
 import TrailMarkCH10Core
 
-// Logs a finished activity by hand and queues it for the phone. A stand-in until
-// Session 3.2 records real workout sessions.
 struct QuickLogView: View {
     @Environment(WatchModel.self) private var model
 
     @State private var minutes = 30
     @State private var loggedCount = 0
 
-    /// Rough walking pace used to estimate distance.
     private static let metersPerMinute = 80.0
 
     var body: some View {

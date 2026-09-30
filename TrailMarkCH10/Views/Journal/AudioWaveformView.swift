@@ -1,28 +1,16 @@
-//
-//  AudioWaveformView.swift
-//  TrailMark (iOS)
-//
-//  Draws the amplitudes TrailMarkCH10Core.WaveformLoader decoded off an audio
-//  file, tinting the part that has already played and scrubbing on drag.
-//
 
 import SwiftUI
 
 struct AudioWaveformView: View {
-    /// Normalized 0...1 amplitudes, one per bar.
     let samples: [Float]
-    /// Fraction of the file already played, 0...1.
     let progress: Double
-    /// Live output level, 0...1, which makes bars at the playhead breathe.
     let level: Float
     let isPlaying: Bool
-    /// Called with a 0...1 position when the user taps or drags the waveform.
     let onSeek: (Double) -> Void
 
     @State private var width: CGFloat = 0
 
     private let minimumBarHeight: CGFloat = 2
-    /// Bars within this many slots of the playhead react to the live level.
     private let liveSpread = 4.0
 
     var body: some View {
@@ -34,8 +22,6 @@ struct AudioWaveformView: View {
                 context.fill(path(for: rect), with: .color(.secondary.opacity(0.35)))
             }
 
-            // Re-draw the same bars in the accent color, clipped to everything
-            // left of the playhead, so the bar it sits on fills partway.
             var played = context
             played.clip(to: Path(CGRect(x: 0, y: 0,
                                         width: size.width * progress,
@@ -77,8 +63,6 @@ struct AudioWaveformView: View {
         }
     }
 
-    /// Bars at the playhead lean on the live meter, so the waveform reacts to
-    /// what is actually coming out of the speaker and not just to the file.
     private func boost(at index: Int, playhead: Double) -> Double {
         guard isPlaying else { return 1 }
 

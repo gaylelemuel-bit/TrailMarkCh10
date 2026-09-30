@@ -2,8 +2,6 @@ import Foundation
 import Observation
 import TrailMarkCH10Core
 
-// Owns the long-lived managers and wires up cross-device sync. Injected into the
-// SwiftUI environment so every screen shares one instance of each manager.
 @MainActor
 @Observable
 final class AppModel {
@@ -13,18 +11,18 @@ final class AppModel {
     let journeyStore = JourneyStore()
     let connectivity = ConnectivityManager.shared
 
+    var presentedError: AppError?
+    private(set) var lastHealthRefresh: Date?
+
     init() {
         wireConnectivity()
     }
 
-    /// Files payloads synced over from the watch into the right store, so they show
-    /// up in the iOS Journeys / Journal lists.
     private func wireConnectivity() {
         connectivity.onReceiveJourney = { [weak self] journey in
             self?.journeyStore.add(journey)
         }
         connectivity.onReceiveWorkout = { [weak self] workout in
-            // Wrap a bare workout in a minimal journey so it still surfaces in the list.
             let journey = Journey(
                 title: "Watch activity",
                 startedAt: workout.start,
@@ -35,17 +33,52 @@ final class AppModel {
         }
         connectivity.onReceiveMediaFile = { [weak self] tempURL, memo in
             guard let self else { return }
-            // Move our copy into the media directory under the memo's own file name,
-            // so `media.url(for:)` resolves it exactly like a locally recorded memo.
             let destination = self.media.mediaDirectory.appendingPathComponent(memo.fileName)
             try? FileManager.default.removeItem(at: destination)
-            guard (try? FileManager.default.moveItem(at: tempURL, to: destination)) != nil else { return }
-            self.media.register(memo)
+
+            do {
+                try FileManager.default.moveItem(at: tempURL, to: destination)
+                self.media.register(memo)
+            } catch {
+                self.presentedError = .mediaImport(error.localizedDescription)
+            }
         }
         connectivity.activate()
     }
 
-    /// Pushes today's summary to the watch as glanceable mirrored state.
+    func refreshHealthData() async {
+        presentedError = nil
+
+        if health.currentAuthStatus == .unknown {
+            await health.requestAuthorization()
+        }
+
+        switch health.currentAuthStatus {
+        case .authorized:
+            await health.refreshTodaysSummary()
+
+            if let message = health.lastErrorMessage {
+                presentedError = .healthRefresh(message)
+            } else {
+                lastHealthRefresh = Date()
+                mirrorTodayToWatch()
+            }
+
+        case .denied:
+            presentedError = .healthAuthorization
+
+        case .unavailable:
+            presentedError = .healthUnavailable
+
+        case .unknown, .requesting:
+            break
+        }
+    }
+
+    func dismissError() {
+        presentedError = nil
+    }
+
     func mirrorTodayToWatch() {
         connectivity.sync(summary: health.todaysSummary)
     }

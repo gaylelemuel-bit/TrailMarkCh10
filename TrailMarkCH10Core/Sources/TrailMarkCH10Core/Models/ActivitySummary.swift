@@ -6,7 +6,7 @@ public struct ActivitySummary: Sendable, Equatable, Codable {
     public var distanceMeters: Double
     public var activeEnergyKcal: Double
     public var date: Date
-    
+
     public init(
         steps: Double = 0,
         distanceMeteres: Double = 0,
@@ -18,20 +18,19 @@ public struct ActivitySummary: Sendable, Equatable, Codable {
         self.activeEnergyKcal = activeEnergyKcal
         self.date = date
     }
-    
+
     public static let empty = ActivitySummary()
-    
-    // MARK: - UI Helpers To Display Data
-    
+
+
     public var stepsText: String {
         Self.wholeNumber.string(from: NSNumber(value: steps)) ?? "00"
     }
-    
+
     public var activeEnergyText: String {
         let value = Self.wholeNumber.string(from: NSNumber(value: activeEnergyKcal)) ?? "00"
         return "\(value) kcal"
     }
-    
+
     public var distanceText: String {
         let formatter = MeasurementFormatter()
         formatter.unitOptions = .naturalScale
@@ -39,7 +38,7 @@ public struct ActivitySummary: Sendable, Equatable, Codable {
         let measurement = Measurement(value: distanceMeters, unit: UnitLength.meters)
         return formatter.string(from: measurement)
     }
-    
+
     private static let wholeNumber: NumberFormatter = {
         let f = NumberFormatter()
         f.numberStyle = .decimal

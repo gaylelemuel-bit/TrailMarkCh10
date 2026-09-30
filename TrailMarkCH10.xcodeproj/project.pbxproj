@@ -169,7 +169,7 @@
 					};
 				};
 			};
-			buildConfigurationList = BC4D8813304C78A400981A88 /* Build configuration list for PBXProject "TrailMarkCH10" */;
+			buildConfigurationList = BC4D8813304C78A400981A88 /* Build configuration list for PBXProject "TrailMarkCh10" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -515,7 +515,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BC4D8813304C78A400981A88 /* Build configuration list for PBXProject "TrailMarkCH10" */ = {
+		BC4D8813304C78A400981A88 /* Build configuration list for PBXProject "TrailMarkCh10" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BC4D8821304C78A700981A88 /* Debug */,

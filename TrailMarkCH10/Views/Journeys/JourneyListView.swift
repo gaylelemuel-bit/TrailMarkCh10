@@ -3,9 +3,9 @@ import TrailMarkCH10Core
 
 struct JourneyListView: View {
     @Environment(AppModel.self) private var model
-    
+
     @State private var showingRecorder = false
-    
+
     var body: some View {
         NavigationStack {
             Group {
@@ -41,7 +41,6 @@ struct JourneyListView: View {
                 }
             }
             .sheet(isPresented: $showingRecorder) {
-                // RecordJourneyView
             }
         }
     }
@@ -49,7 +48,7 @@ struct JourneyListView: View {
 
 struct JourneyRow: View {
     let journey: Journey
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(journey.title).font(.headline)
@@ -59,14 +58,14 @@ struct JourneyRow: View {
             }
             .font(.caption)
             .foregroundStyle(.secondary)
-            
+
             Text(journey.dateText).font(.caption2).foregroundStyle(.tertiary)
         }
     }
-    
+
     private var distanceText: String {
         let measurement = Measurement(value: journey.distanceMeters, unit: UnitLength.meters)
         return measurement.formatted(.measurement(width: .abbreviated, usage: .road))
     }
-    
+
 }

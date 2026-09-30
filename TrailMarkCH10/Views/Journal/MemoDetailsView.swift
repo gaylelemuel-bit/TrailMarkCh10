@@ -6,9 +6,9 @@ struct MemoDetailsView: View {
     @Environment(AppModel.self) private var model
 
     let memo: MediaMemo
-    
+
     @State private var audioPlayer = AudioPlayer()
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -56,10 +56,7 @@ struct MemoDetailsView: View {
         .frame(maxWidth: .infinity)
         .padding(20)
         .background(.background.secondary, in: RoundedRectangle(cornerRadius: 12))
-        // Decode the waveform once the view is on screen, so the shape is there
-        // before the user reaches for the play button.
         .task(id: memo.id) { await audioPlayer.prepare(url: audioURL) }
-        // Drive the playhead and the output meter while playing.
         .task(id: audioPlayer.isPlaying) {
             while audioPlayer.isPlaying && !Task.isCancelled {
                 audioPlayer.tick()
@@ -71,8 +68,6 @@ struct MemoDetailsView: View {
     @ViewBuilder
     private var waveform: some View {
         if audioPlayer.waveform.isEmpty {
-            // Nothing to draw yet: either still decoding, or the file wouldn't
-            // decode at all and the static glyph is the honest fallback.
             ZStack {
                 Image(systemName: "waveform")
                     .font(.system(size: 44))
@@ -103,7 +98,7 @@ struct MemoDetailsView: View {
         let minutes = Int(interval) / 60
         let seconds = Int(interval) % 60
 
-        return String(format: "%02d:%02d", minutes, seconds) // 00:00
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 
     private var metadata: some View {

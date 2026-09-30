@@ -5,12 +5,12 @@ public struct Journey: Identifiable, Hashable, Sendable, Codable {
     public let title: String
     public let startedAt: Date
     public let endedAt: Date?
-    
+
     public var track: RouteTrack
     public var memoIDs: [UUID]
-    
+
     public var workout: WorkoutRecord?
-    
+
     public init(
         id: UUID = UUID(),
         title: String = "Untitled Journey",
@@ -28,17 +28,16 @@ public struct Journey: Identifiable, Hashable, Sendable, Codable {
         self.memoIDs = memoIDs
         self.workout = workout
     }
-    
-    // MARK: - UI Helpers
-    
+
+
     public var dateText: String {
         let df = DateFormatter()
         df.dateStyle = .medium
         df.timeStyle = .short
-        
+
         return df.string(from: startedAt)
     }
-    
+
     public var distanceMeters: Double {
         workout?.distanceMeters ?? track.distanceMeters
     }

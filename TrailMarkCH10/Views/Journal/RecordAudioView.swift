@@ -4,10 +4,10 @@ import TrailMarkCH10Core
 struct RecordAudioView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var recorder = AudioRecorder()
     @State private var errorMessages: String?
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 32) {
@@ -16,7 +16,7 @@ struct RecordAudioView: View {
                 Text(timeString(recorder.elapsedTime))
                     .font(.system(size: 56, design: .rounded).monospacedDigit())
                     .contentTransition(.numericText())
-                
+
                 Image(
                     systemName: recorder.isRecording ?
                     "waveform.circle.fill": "mic.circle"
@@ -24,9 +24,9 @@ struct RecordAudioView: View {
                 .font(.system(size: 96))
                 .foregroundStyle(recorder.isRecording ? .red : .secondary)
                 .symbolEffect(.pulse, isActive: recorder.isRecording)
-                
+
                 Spacer()
-                
+
                 Button {
                     recorder.isRecording ? finish() : begin()
                 } label: {
@@ -40,7 +40,7 @@ struct RecordAudioView: View {
                         )
                         .foregroundStyle(.white)
                 }
-                
+
                 if let errorMessages {
                     Text(errorMessages).font(.footnote).foregroundStyle(.red)
                 }
@@ -61,12 +61,12 @@ struct RecordAudioView: View {
             }
         }
     }
-    
+
     private func begin() {
         do { try recorder.start() }
         catch { errorMessages = error.localizedDescription }
     }
-    
+
     private func finish() {
         guard let result = recorder.stop() else { return }
         _ = try? model.media.add(
@@ -77,11 +77,11 @@ struct RecordAudioView: View {
         )
         dismiss()
     }
-    
+
     private func timeString(_ interval: TimeInterval) -> String {
         let minutes = Int(interval) / 60
         let seconds = Int(interval) % 60
-        
-        return String(format: "%02d:%02d", minutes, seconds) // 00:00
+
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

@@ -1,13 +1,11 @@
 import Foundation
 
-/// A completed activity, ready to be written to HealthKit as an `HKWorkout`.
 public struct WorkoutRecord: Identifiable, Hashable, Sendable, Codable {
     public let id: UUID
     public var start: Date
     public var end: Date
     public var activeEnergyKcal: Double
     public var distanceMeters: Double
-    /// Average heart rate over the session, if known.
     public var averageHeartRate: Double?
 
     public init(
@@ -26,14 +24,13 @@ public struct WorkoutRecord: Identifiable, Hashable, Sendable, Codable {
         self.averageHeartRate = averageHeartRate
     }
 
-    // MARK: - UI Display Helpers
 
     public var duration: TimeInterval { end.timeIntervalSince(start) }
 
     public var durationText: String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute, .second]
-        formatter.zeroFormattingBehavior = .pad // 00:30:00
+        formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: duration) ?? "0:00"
     }
 }

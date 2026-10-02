@@ -8,9 +8,13 @@ final class WatchModel {
     let health = HealthKitManager()
     let media = MediaStore()
     let motion = MotionManager()
+    let workout = WorkoutSessionManager()
     let connectivity = ConnectivityManager.shared
 
     init() {
+        workout.onFinish = { [weak self] record in
+            self?.syncFinished(workout: record)
+        }
         connectivity.activate()
     }
 

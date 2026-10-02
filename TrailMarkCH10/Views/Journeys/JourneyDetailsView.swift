@@ -43,7 +43,7 @@ struct JourneyDetailsView: View {
             }
         }
         .frame(height: 280)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 
     private var cameraPosition: MapCameraPosition {
@@ -79,7 +79,7 @@ struct JourneyDetailsView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
+        .trailMarkCard()
     }
 
     private func stat(_ label: String, _ value: String) -> some View {
@@ -96,19 +96,19 @@ struct JourneyDetailsView: View {
             LabeledContent("Duration", value: workout.durationText)
             LabeledContent("Active Energy", value: "\(Int(workout.activeEnergyKcal)) kcal")
             if let hr = workout.averageHeartRate {
-                LabeledContent("Avg. Hearth Rate", value: "\(Int(hr)) bpm").font(.headline)
+                LabeledContent("Avg. Heart Rate", value: "\(Int(hr)) bpm").font(.headline)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(.background.secondary, in: RoundedRectangle(cornerRadius: 16))
+        .trailMarkCard()
     }
 
     @ViewBuilder
     private var memoSection: some View {
         if !memos.isEmpty {
             VStack(alignment: .leading) {
-                Text("Captured algong the way").font(.headline)
+                Text("Captured Along the Way").font(.headline)
                 ForEach(memos) { memo in
                     NavigationLink(value: memo) { MemoRow(memo: memo) }
                 }

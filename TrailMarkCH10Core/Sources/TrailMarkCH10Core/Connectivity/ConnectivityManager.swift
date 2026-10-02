@@ -216,6 +216,7 @@ extension ConnectivityManager: WCSessionDelegate {
             case .summary:
                 if let summary = try? JSONDecoder().decode(ActivitySummary.self, from: data) {
                     self.mirroredSummary = summary
+                    SharedMetricStore.save(SharedMetricSnapshot(summary: summary))
                 }
             case .workout:
                 if let workout = try? JSONDecoder().decode(WorkoutRecord.self, from: data) {

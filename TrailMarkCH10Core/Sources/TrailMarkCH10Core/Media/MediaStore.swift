@@ -76,6 +76,11 @@ public final class MediaStore {
         persistIndex()
     }
 
+    public func delete(_ memo: MediaMemo) {
+        try? fileManager.removeItem(at: url(for: memo))
+        memos.removeAll { $0.id == memo.id }
+        persistIndex()
+    }
 
     private func loadIndexData() {
         guard let data = try? Data(contentsOf: indexURL) else { return }

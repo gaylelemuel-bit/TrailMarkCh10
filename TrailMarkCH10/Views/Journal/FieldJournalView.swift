@@ -3,7 +3,6 @@ import TrailMarkCH10Core
 
 struct FieldJournalView: View {
     @Environment(AppModel.self) private var model
-
     @State private var showingAudioRecorder = false
     @State private var showingVideoPicker = false
 
@@ -11,19 +10,39 @@ struct FieldJournalView: View {
         NavigationStack {
             Group {
                 if model.media.memos.isEmpty {
-                    ContentUnavailableView(
-                        "No memos yet",
-                        systemImage: "Waveform",
-                        description:  Text("Record a voice or video memo to start your journey")
-                    )
+                    TrailMarkEmptyState(
+                        title: "Capture the moment",
+                        message: "Save a voice note or video while you explore. Every memory stays ready for your journey.",
+                        symbol: "waveform.and.mic",
+                        actionTitle: "Record Voice Memo"
+                    ) {
+                        showingAudioRecorder = true
+                    }
                 } else {
                     List {
-                        ForEach(model.media.memos) { memo in
-                            NavigationLink(value: memo) {
-                                MemoRow(memo: memo)
+                        Section {
+                            journalOverview
+                                .listRowInsets(EdgeInsets())
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                        }
+
+                        Section("Recent Captures") {
+                            ForEach(model.media.memos) { memo in
+                                NavigationLink(value: memo) {
+                                    MemoRow(memo: memo)
+                                }
+                                .listRowBackground(Color.clear)
+                                .listRowSeparator(.hidden)
+                            }
+                            .onDelete { offsets in
+                                for index in offsets {
+                                    model.media.delete(model.media.memos[index])
+                                }
                             }
                         }
                     }
+                    .listStyle(.plain)
                 }
             }
             .navigationTitle("Field Journal")
@@ -32,11 +51,12 @@ struct FieldJournalView: View {
             }
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
-                    Button { showingVideoPicker = true } label: {
-                        Image(systemName: "video.badge.plus")
+                    Button("Add Video", systemImage: "video.badge.plus") {
+                        showingVideoPicker = true
                     }
-                    Button { showingAudioRecorder = true } label: {
-                        Image(systemName: "mic.badge.plus")
+
+                    Button("Record Audio", systemImage: "mic.badge.plus") {
+                        showingAudioRecorder = true
                     }
                 }
             }
@@ -45,50 +65,84 @@ struct FieldJournalView: View {
             }
             .sheet(isPresented: $showingVideoPicker) {
                 VideoCaptureView { url, duration in
-                    _ = try? model.media.add(
-                        kind: .video,
-                        movingFileFrom: url,
-                        duration: duration,
-                        coordinate: model.location.currentCoordinate
-                    )
+                    do {
+                        try model.media.add(
+                            kind: .video,
+                            movingFileFrom: url,
+                            duration: duration,
+                            coordinate: model.location.currentCoordinate
+                        )
+                    } catch {
+                        model.presentedError = .mediaImport(error.localizedDescription)
+                    }
                 }
             }
         }
     }
+
+    private var journalOverview: some View {
+        HStack(spacing: 16) {
+            Image(systemName: "waveform.badge.mic")
+                .font(.title)
+                .foregroundStyle(.white)
+                .frame(width: 56, height: 56)
+                .background(TrailMarkStyle.journalGradient, in: Circle())
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(captureCountText)
+                    .font(.title3.bold())
+                Text("Moments saved from the trail")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+        .trailMarkCard()
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var captureCountText: String {
+        let count = model.media.memos.count
+        return "\(count) \(count == 1 ? "capture" : "captures")"
+    }
 }
 
 struct MemoRow: View {
-    @Environment(AppModel.self) private var model
-
     let memo: MediaMemo
 
-    @State private var thumbnail: UIImage?
-
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(.background.secondary)
-                if let thumbnail {
-                    Image(uiImage: thumbnail)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else {
-                    Image(systemName: memo.kind.symbolName)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .frame(width: 54, height: 54)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(
+                        memo.kind == .audio
+                            ? Color.teal.opacity(0.12)
+                            : Color.purple.opacity(0.12)
+                    )
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(memo.title).font(.headline).lineLimit(1)
-                HStack(spacing: 8) {
+                Image(systemName: memo.kind.symbolName)
+                    .font(.title3)
+                    .foregroundStyle(memo.kind == .audio ? .teal : .purple)
+            }
+            .frame(width: 52, height: 52)
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(memo.title)
+                    .font(.headline)
+                    .lineLimit(1)
+
+                HStack(spacing: 10) {
                     Label(memo.durationText, systemImage: "clock")
+                    Text(memo.createdAt, format: .dateTime.month(.abbreviated).day())
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
         }
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
     }
 }

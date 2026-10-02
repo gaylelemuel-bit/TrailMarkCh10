@@ -28,6 +28,7 @@ struct ContentView: View {
                     Label("Recovery", systemImage: "bed.double.fill")
                 }
         }
+        .tint(.orange)
         .task {
             await model.refreshHealthData()
         }

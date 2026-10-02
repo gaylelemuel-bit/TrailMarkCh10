@@ -11,6 +11,12 @@ struct ContentView: View {
 
                 Section("Explore") {
                     NavigationLink {
+                        LiveWorkoutView()
+                    } label: {
+                        Label("Start Workout", systemImage: "figure.walk.circle.fill")
+                    }
+
+                    NavigationLink {
                         LiveVitalsView()
                     } label: {
                         Label("Live Vitals", systemImage: "heart.text.square.fill")

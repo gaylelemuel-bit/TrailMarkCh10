@@ -80,6 +80,8 @@ final class AppModel {
     }
 
     func mirrorTodayToWatch() {
-        connectivity.sync(summary: health.todaysSummary)
+        let summary = health.todaysSummary
+        SharedMetricStore.save(SharedMetricSnapshot(summary: summary))
+        connectivity.sync(summary: summary)
     }
 }
